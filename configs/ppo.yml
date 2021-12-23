@@ -1,6 +1,6 @@
 iglu-baseline:
     env: IGLUSilentBuilder-v0
-    run: IMPALA
+    run: PPO
     stop:
         timesteps_total: 150000
     checkpoint_at_end: True
