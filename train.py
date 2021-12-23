@@ -148,4 +148,4 @@ if __name__ == '__main__':
         else:
             loggers = DEFAULT_LOGGERS
             
-        tune.run(run, **config[key], loggers=loggers)
+        tune.run(run, **config[key], loggers=loggers, local_dir = "./experiment")
