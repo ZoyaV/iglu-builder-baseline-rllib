@@ -2,7 +2,7 @@ iglu-baseline:
     env: IGLUSilentBuilder-v0
     run: PPO
     stop:
-        timesteps_total: 150000
+        timesteps_total: 850000
     checkpoint_at_end: True
     checkpoint_freq: 10 # roughly each 50k steps
     config:
@@ -16,7 +16,7 @@ iglu-baseline:
           # if task_mode is one_task -> string with task id
           # if task_mode is many_tasks -> list of task ids
           # if task_mode is random_tasks -> ignored
-          task_id: C32
+          task_id: C34
           # only used if task_mode is random_tasks
           random_tasks:
             max_blocks: 20
@@ -29,22 +29,22 @@ iglu-baseline:
           custom_model: pov_baseline_model
           use_lstm: True
         framework: torch
-        vtrace: True
-        vtrace_clip_rho_threshold: 1.0
-        vtrace_clip_pg_rho_threshold: 1.0
+        #vtrace: True
+        #vtrace_clip_rho_threshold: 1.0
+        #vtrace_clip_pg_rho_threshold: 1.0
         rollout_fragment_length: 100
         train_batch_size: 5000
-        num_workers: 2
-        num_gpus: 1
-        broadcast_interval: 1
-        max_sample_requests_in_flight_per_worker: 2 
-        num_multi_gpu_tower_stacks: 10
+        num_workers: 20
+        num_gpus: 2
+#        broadcast_interval: 1
+#        max_sample_requests_in_flight_per_worker: 2 
+ #       num_multi_gpu_tower_stacks: 10
         num_envs_per_worker: 1
-        replay_proportion: 1.0
-        replay_buffer_num_slots: 100
-        learner_queue_timeout: 1000
-        minibatch_buffer_size: 10
-        learner_queue_size: 32
+#        replay_proportion: 1.0
+ #       replay_buffer_num_slots: 100
+#        learner_queue_timeout: 1000
+#        minibatch_buffer_size: 10
+#        learner_queue_size: 32
         num_sgd_iter: 5
         lr_schedule: [
             [0, 0.0005],
