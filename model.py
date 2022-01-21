@@ -17,8 +17,8 @@ torch, nn = try_import_torch()
 class ResudualBlock(nn.Module):
     def __init__(self, ni):
         super(ResudualBlock, self).__init__()
-        self.conv1 = nn.Conv2d(ni, ni, 3, 3, 1)
-        self.conv2 = nn.Conv2d(ni, ni, 3, 3, 1)
+        self.conv1 = nn.Conv2d(ni, ni, 3, stride = 1)
+        self.conv2 = nn.Conv2d(ni, ni, 3, stride = 1)
         self.relu1 = nn.ReLU()
         self.relu2 = nn.ReLU()
 
@@ -43,8 +43,8 @@ class LargePovBaselineModel(TorchModelV2, nn.Module):
         inv_emded_size = 128
         embed_size = 256
 
-        self.conv3x3 = nn.Conv2d(3,64, 3,3,1)
-        self.max_pull = nn.MaxPool2d(3,3,stride=2)
+        self.conv3x3 = nn.Conv2d(3,64, 3, stride = 1)
+        self.max_pull = nn.MaxPool2d(3,3, stride=2)
 
         self.res_block_1 = ResudualBlock(64)
         self.res_block_2 = ResudualBlock(128)
