@@ -14,6 +14,72 @@ from ray.rllib.models.preprocessors import DictFlatteningPreprocessor, get_prepr
 torch, nn = try_import_torch()
 
 
+class ResudualBlock(nn.Module):
+    def __init__(self, ni):
+        super(ResudualBlock, self).__init__()
+        self.conv1 = nn.Conv2d(ni, ni, 3, 3, 1)
+        self.conv2 = nn.Conv2d(ni, ni, 3, 3, 1)
+        self.relu1 = nn.ReLU()
+        self.relu2 = nn.ReLU()
+
+    def forward(self, x):
+        residual = x
+        out = self.relu1(self.conv1(x))
+        out = self.relu2(self.conv2(out))
+        out += residual
+        out = out.view(out.size(0), -1)
+        return out
+
+class LargePovBaselineModel(TorchModelV2, nn.Module):
+    def __init__(self, obs_space, action_space, num_outputs, model_config,
+                 name):
+        nn.Module.__init__(self)
+        super().__init__(obs_space, action_space, num_outputs,
+                              model_config, name)
+        if num_outputs is None:
+            # required by rllib's lstm wrapper
+            num_outputs = int(np.product(self.obs_space.shape))
+        pov_embed_size = 128
+        inv_emded_size = 128
+        embed_size = 256
+
+        self.conv3x3 = nn.Conv2d(3,64, 3,3,1)
+        self.max_pull = nn.MaxPool2d(3,3,stride=2)
+
+        self.res_block_1 = ResudualBlock(64)
+        self.res_block_2 = ResudualBlock(128)
+
+        self.inventory_compass_emb = nn.Sequential(
+            nn.Linear(7, inv_emded_size),
+            nn.ReLU(),
+            nn.Linear(inv_emded_size, inv_emded_size),
+            nn.ReLU(),
+        )
+        self.head = nn.Sequential(
+            nn.Linear(pov_embed_size + inv_emded_size, embed_size),
+            nn.ReLU(),
+            nn.Linear(embed_size, embed_size),
+            nn.ReLU(),
+            nn.Linear(embed_size, num_outputs),
+        )
+
+    def forward(self, input_dict, state, seq_lens):
+        obs = input_dict['obs']
+        pov = obs['pov'] / 255. - 0.5
+        pov = pov.transpose(2, 3).transpose(1, 2).contiguous()
+        pov_embed = self.conv3x3(pov)
+        pov_embed = self.max_pull(pov_embed)
+        pov_embed = self.res_block_1(pov_embed)
+        pov_embed = self.res_block_2(pov_embed)
+
+        pov_embed = pov_embed.reshape(pov_embed.shape[0], -1)
+
+        inventory_compass = torch.cat([obs['inventory'], obs['compass']], 1)
+        inv_comp_emb = self.inventory_compass_emb(inventory_compass)
+
+        head_input = torch.cat([pov_embed, inv_comp_emb], 1)
+        return self.head(head_input), state
+
 class PovBaselineModel(TorchModelV2, nn.Module):
     def __init__(self, obs_space, action_space, num_outputs, model_config,
                  name):
