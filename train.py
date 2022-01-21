@@ -25,7 +25,7 @@ from wrappers import \
     Logger
 from ray.rllib.evaluation.metrics import collect_episodes, summarize_episodes
 
-from model import GridBaselineModel, PovBaselineModel
+from model import GridBaselineModel, PovBaselineModel, LargePovBaselineModel
 
 logging.basicConfig(stream=sys.stdout)
 
@@ -109,6 +109,8 @@ def register_models():
         "grid_baseline_model", GridBaselineModel)
     ModelCatalog.register_custom_model(
         "pov_baseline_model", PovBaselineModel)
+    ModelCatalog.register_custom_model(
+        "large_pov_baseline_model", LargePovBaselineModel)
 
 if __name__ == '__main__':
     parser = ArgumentParser()
