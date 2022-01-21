@@ -15,20 +15,24 @@ torch, nn = try_import_torch()
 
 
 class ResudualBlock(nn.Module):
-    def __init__(self, ni):
-        super(ResudualBlock, self).__init__()
-        self.conv1 = nn.Conv2d(ni, ni, 3, stride = 1)
-        self.conv2 = nn.Conv2d(ni, ni, 3, stride = 1)
-        self.relu1 = nn.ReLU()
-        self.relu2 = nn.ReLU()
+    def __init__(self, Nin, out, ksize=3, stride=1):
+        super.__init__()
+        self.conv1 = nn.Conv2d(Nin, out, ksize, stride, padding=1)
+        self.Relu = nn.ReLU()
+        self.bn = nn.BatchNorm2d(out)
 
-    def forward(self, x):
-        residual = x
-        out = self.relu1(self.conv1(x))
-        out = self.relu2(self.conv2(out))
-        out += residual
-        out = out.view(out.size(0), -1)
-        return out
+    def forward(self, input):
+        x = input
+        x = self.conv1(x)
+        x = self.bn(x)
+        x = self.Relu(x)
+
+        x = self.conv1(x)
+        x = self.bn(x)
+
+        x = x + input
+        output = self.Relu(x)
+        return output
 
 class LargePovBaselineModel(TorchModelV2, nn.Module):
     def __init__(self, obs_space, action_space, num_outputs, model_config,
@@ -39,15 +43,15 @@ class LargePovBaselineModel(TorchModelV2, nn.Module):
         if num_outputs is None:
             # required by rllib's lstm wrapper
             num_outputs = int(np.product(self.obs_space.shape))
-        pov_embed_size = 128
-        inv_emded_size = 128
-        embed_size = 256
+        pov_embed_size = 256
+        inv_emded_size = 256
+        embed_size = 256*2
 
         self.conv3x3 = nn.Conv2d(3,64, 3, stride = 1)
-        self.max_pull = nn.MaxPool2d(3,3, stride=2)
+        self.max_pull = nn.MaxPool2d((3,3), stride=2)
 
-        self.res_block_1 = ResudualBlock(64)
-        self.res_block_2 = ResudualBlock(128)
+        self.res_block_1 = ResudualBlock(64, 128)
+        self.res_block_2 = ResudualBlock(128, pov_embed_size)
 
         self.inventory_compass_emb = nn.Sequential(
             nn.Linear(7, inv_emded_size),
