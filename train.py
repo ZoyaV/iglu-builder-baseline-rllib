@@ -9,6 +9,9 @@ import logging
 from collections import defaultdict
 from filelock import FileLock
 from iglu.tasks import RandomTasks, TaskSet
+from ray.rllib.execution.common import AGENT_STEPS_SAMPLED_COUNTER, \
+    STEPS_SAMPLED_COUNTER, STEPS_TRAINED_COUNTER, \
+    STEPS_TRAINED_THIS_ITER_COUNTER, _get_shared_metrics
 from ray import tune
 from ray.rllib.models import ModelCatalog
 from ray.tune.logger import DEFAULT_LOGGERS
@@ -24,12 +27,12 @@ from wrappers import \
     VisualObservationWrapper, \
     Logger
 from ray.rllib.evaluation.metrics import collect_episodes, summarize_episodes
-
+import datetime
 from model import GridBaselineModel, PovBaselineModel, LargePovBaselineModel
 
 logging.basicConfig(stream=sys.stdout)
 
-
+start = datetime.datetime.now()
 def evaluate_separately(trainer, eval_workers):
     w = next(iter(eval_workers.remote_workers()))
     env_ids = ray.get(w.foreach_env.remote(lambda env: list(env.tasks.preset.keys())))[0]
@@ -47,7 +50,11 @@ def evaluate_separately(trainer, eval_workers):
     metrics = summarize_episodes(episodes)
     for eid, ep in zip(env_ids, all_episodes):
         metrics[f'env_{eid}_reward'] = ep.episode_reward
+    end = datetime.datetime.now()
+    total_ts = metrics.counters.get( AGENT_STEPS_SAMPLED_COUNTER, 0)
+    metrics['FPS'] = total_ts/((end-start).microseconds/ 1000000)
     return metrics
+
 
 
 def build_env(env_config=None, env_factory=None):

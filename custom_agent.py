@@ -16,6 +16,11 @@ from ray.rllib.agents.registry import get_trainer_class
 
 CONFIG_FILE = './apex_c32/apex_c32.yml'
 
+def fake_env_creator(env_config=None):
+    env = FakeIglu({})
+    env = SelectAndPlace(env)
+    env = Discretization(env, flat_action_space('human-level'))
+    return env
 
 class CustomAgent:
     def __init__(self, action_space):
