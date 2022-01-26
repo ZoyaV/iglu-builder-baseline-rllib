@@ -31,6 +31,8 @@ from model import GridBaselineModel, PovBaselineModel, LargePovBaselineModel
 logging.basicConfig(stream=sys.stdout)
 
 start = datetime.datetime.now()
+
+os.environ['WANDB_APIKEY'] = "e5ac79d62944a4e1910f83da82ae92c37b09ecdf"
 def evaluate_separately(trainer, eval_workers):
     w = next(iter(eval_workers.remote_workers()))
     env_ids = ray.get(w.foreach_env.remote(lambda env: list(env.tasks.preset.keys())))[0]
@@ -122,7 +124,7 @@ if __name__ == '__main__':
     parser = ArgumentParser()
     parser.add_argument('-f', type=str, help='file')
     parser.add_argument('--local', action='store_true', default=False)
-    parser.add_argument('--wdb', action='store_true', default=False)
+    parser.add_argument('--wdb', action='store_true', default=True)
     args = parser.parse_args()
     if args.local:
         ray.init(local_mode=True)
