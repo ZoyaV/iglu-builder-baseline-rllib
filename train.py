@@ -9,9 +9,7 @@ import logging
 from collections import defaultdict
 from filelock import FileLock
 from iglu.tasks import RandomTasks, TaskSet
-from ray.rllib.execution.common import AGENT_STEPS_SAMPLED_COUNTER, \
-    STEPS_SAMPLED_COUNTER, STEPS_TRAINED_COUNTER, \
-    STEPS_TRAINED_THIS_ITER_COUNTER, _get_shared_metrics
+from ray.rllib.execution.common import AGENT_STEPS_SAMPLED_COUNTER,_get_shared_metrics
 from ray import tune
 from ray.rllib.models import ModelCatalog
 from ray.tune.logger import DEFAULT_LOGGERS
@@ -51,7 +49,8 @@ def evaluate_separately(trainer, eval_workers):
     for eid, ep in zip(env_ids, all_episodes):
         metrics[f'env_{eid}_reward'] = ep.episode_reward
     end = datetime.datetime.now()
-    total_ts = metrics.counters.get( AGENT_STEPS_SAMPLED_COUNTER, 0)
+    METRIX = _get_shared_metrics()
+    total_ts = METRIX.counters.get( AGENT_STEPS_SAMPLED_COUNTER, 0)
     metrics['FPS'] = total_ts/((end-start).microseconds/ 1000000)
     return metrics
 
