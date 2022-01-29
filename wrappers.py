@@ -421,6 +421,38 @@ class Logger(Wrapper):
         self.running_reward += reward
         return obs, reward, done, info
 
+class VisualOneBlockObservationWrapper(ObsWrapper):
+    def __init__(self, env, include_target=False):
+        super().__init__(env)
+        self.observation_space = {
+            'pov': gym.spaces.Box(low=0, high=255, shape=(64, 64, 3)),
+            'inventory': gym.spaces.Box(low=0.0, high=20.0, shape=(6,)),
+            'compass': gym.spaces.Box(low=-180.0, high=180.0, shape=(1,))
+        }
+        if include_target:
+            self.observation_space['target'] = \
+                spaces.Tuple(spaces.Discrete(9),spaces.Discrete(11),spaces.Discrete(11))
+        self.observation_space = gym.spaces.Dict(self.observation_space)
+
+    def observation(self, obs, reward=None, done=None, info=None):
+        if info is not None:
+            if 'target_grid' in info:
+                target_grid = info['target_grid']
+                #del info['target_grid']
+            else:
+                logger.error(f'info: {info}')
+                if hasattr(self.unwrapped, 'should_reset'):
+                    self.unwrapped.should_reset(True)
+                target_grid = self.env.unwrapped.tasks.current.target_grid
+        else:
+            target_grid = self.env.unwrapped.tasks.current.target_grid
+        target = np.where(target_grid!=0)
+        return {
+            'pov': obs['pov'].astype(np.float32),
+            'inventory': obs['inventory'],
+            'compass': np.array([obs['compass']['angle'].item()]),
+            'target':(target[0,0],target[1,0],target[2,0])
+        }
 
 class VisualObservationWrapper(ObsWrapper):
     def __init__(self, env, include_target=False):
