@@ -23,10 +23,13 @@ from wrappers import \
     TimeLimit, \
     VectorObservationWrapper, \
     VisualObservationWrapper, \
+    VisualOneBlockObservationWrapper, \
     Logger
 from ray.rllib.evaluation.metrics import collect_episodes, summarize_episodes
 import datetime
 from model import GridBaselineModel, PovBaselineModel, LargePovBaselineModel
+from custom_tasks import make_3d_cube
+from one_block_wrapppers import CompleteReward, SizeLongReward
 
 logging.basicConfig(stream=sys.stdout)
 
@@ -88,6 +91,8 @@ def build_env(env_config=None, env_factory=None):
             env.set_task(env_config['task_id'])
         elif env_config['task_mode'] == 'many_tasks':
             env.update_taskset(TaskSet(preset=env_config['task_id']))
+        elif env_config['task_mode'] == 'custom_task':
+            env.update_taskset(make_3d_cube())
         elif env_config['task_mode'] == 'random_tasks':
             env.update_taskset(RandomTasks(
                max_blocks=env_config['random_tasks'].get('max_blocks', 3),
@@ -105,11 +110,16 @@ def build_env(env_config=None, env_factory=None):
     # visual - pov + inventory + compass + target grid; 
     # vector: grid + position + inventory + target grid
     if env_config['visual']:
-        env = VisualObservationWrapper(env)
+        if env_config['one_block']:
+            env = VisualOneBlockObservationWrapper(env)
+        else:
+            env = VisualObservationWrapper(env)
     else:
         env = VectorObservationWrapper(env)
     if env_config.get('size_reward', False):
         env = SizeReward(env)
+    if env_config.get('success_rate', False):
+        env = CompleteReward(env)
     env = TimeLimit(env, limit=env_config['time_limit'])
     return env
 
