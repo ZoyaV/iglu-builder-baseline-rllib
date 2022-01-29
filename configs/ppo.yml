@@ -9,6 +9,7 @@ iglu-baseline:
         env_config: 
           action_space: human-level
           visual: true
+          one_block: false
           size_reward: true
           time_limit: 500
           # possible values are: 'one_task', 'many_tasks', 'random_tasks'
@@ -34,8 +35,8 @@ iglu-baseline:
         #vtrace_clip_pg_rho_threshold: 1.0
         rollout_fragment_length: 100
         train_batch_size: 5000
-        num_workers: 20
-        num_gpus: 2
+        num_workers: 10
+        num_gpus: 1
 #        broadcast_interval: 1
 #        max_sample_requests_in_flight_per_worker: 2 
  #       num_multi_gpu_tower_stacks: 10
