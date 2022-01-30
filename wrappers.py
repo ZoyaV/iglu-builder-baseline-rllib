@@ -484,7 +484,7 @@ class VisualOneBlockObservationWrapper(ObsWrapper):
             'inventory': obs['inventory'],
             'compass': np.array([obs['compass']['angle'].item()])
         }
-    
+
 class VisualObservationWrapper(ObsWrapper):
     def __init__(self, env, include_target=False):
         super().__init__(env)

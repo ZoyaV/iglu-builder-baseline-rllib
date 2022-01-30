@@ -23,7 +23,7 @@ class CompleteReward(gym.Wrapper):
 
     def step(self, action):
         obs, reward, done, info = super().step(action)
-        done = self.check_complete(self, info)
+        done = self.check_complete(info)
         if done:
             reward = 1
         else:
