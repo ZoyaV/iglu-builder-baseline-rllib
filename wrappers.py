@@ -461,7 +461,7 @@ class VisualOneBlockObservationWrapper(ObsWrapper):
             'pov': gym.spaces.Box(low=0, high=255, shape=(64, 64, 3)),
             'inventory': gym.spaces.Box(low=0.0, high=20.0, shape=(6,)),
             'compass': gym.spaces.Box(low=-180.0, high=180.0, shape=(1,)),
-            'target': spaces.Tuple(spaces.Discrete(9),spaces.Discrete(11),spaces.Discrete(11))
+            'target': spaces.Tuple([spaces.Discrete(9),spaces.Discrete(11),spaces.Discrete(11)])
         }
         if include_target:
             self.observation_space['target_grid'] = \
