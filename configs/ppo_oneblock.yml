@@ -8,7 +8,7 @@ iglu-baseline:
     config:
         env_config: 
           action_space: human-level
-          visual: false
+          visual: true
           one_block: true
           size_reward: false
           success_rate: true
