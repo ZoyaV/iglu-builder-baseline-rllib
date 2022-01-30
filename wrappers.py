@@ -485,7 +485,7 @@ class VisualOneBlockObservationWrapper(ObsWrapper):
             'pov': obs['pov'].astype(np.float32),
             'inventory': obs['inventory'],
             'compass': np.array([obs['compass']['angle'].item()]),
-            'target': (target[0, 0], target[1, 0], target[2, 0])
+            'target': (target[0][0], target[1][0], target[2][0])
         }
 
 class VisualObservationWrapper(ObsWrapper):
