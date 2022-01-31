@@ -28,7 +28,7 @@ iglu-baseline:
             num_colors: 6
             max_cache: 1
         model:
-          custom_model: large_pov_baseline_model
+          custom_model: pov_baseline_model
           use_lstm: True
         framework: torch
         #vtrace: True
