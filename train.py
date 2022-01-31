@@ -165,6 +165,8 @@ if __name__ == '__main__':
         config[key]['config']['custom_eval_function'] = evaluate_separately
         if args.rnd_goal:
             config[key]['config']['env_config']['random_target']=True
+        else:
+            config[key]['config']['env_config']['random_target'] = False
         if args.local:
             config[key]['config']['num_workers'] = 1
             config[key]['stop']['timesteps_total'] = 3000
