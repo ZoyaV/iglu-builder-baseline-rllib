@@ -32,12 +32,20 @@ class RandomTarget(gym.Wrapper):
         return  obs, reward, done, info
 
 class CompleteReward(gym.Wrapper):
+    def __init__(self, env, color_free = False):
+        super().__init__(env)
+        self.color_free = color_free
+
     def check_complete(self, info):
-        roi = info['grid'][info['target_grid'] != 0]
-        tg = info['target_grid'][info['target_grid'] != 0]
-        res = np.sum(roi == tg)
-        # print(roi == tg)
-        return res != 0
+        if self.color_free:
+            res = info['target_grid'] - info['grid']
+            res[res < 0] = 0
+            return len(np.where(res != 0)[0]) == 0
+        else:
+            roi = info['grid'][info['target_grid'] != 0]
+            tg = info['target_grid'][info['target_grid'] != 0]
+            res = np.sum(roi == tg)
+            return res != 0
 
     def step(self, action):
         obs, reward, done, info = super().step(action)

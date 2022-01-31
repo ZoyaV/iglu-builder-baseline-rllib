@@ -124,7 +124,11 @@ def build_env(env_config=None, env_factory=None):
     if env_config.get('size_reward', False):
         env = SizeReward(env)
     if env_config.get('success_rate', False):
-        env = CompleteReward(env)
+        if env_config['color_free']:
+            env = CompleteReward(env, color_free=True)
+            print("Color free")
+        else:
+            env = CompleteReward(env)
     env = TimeLimit(env, limit=env_config['time_limit'])
     return env
 
@@ -142,6 +146,7 @@ if __name__ == '__main__':
     parser.add_argument('--local', action='store_true', default=False)
     parser.add_argument('--wdb', action='store_true', default=True)
     parser.add_argument('--rnd_goal', action='store_true', default=False)
+    parser.add_argument('--color_free', action='store_true', default=False)
     args = parser.parse_args()
     if args.local:
         ray.init(local_mode=True)
@@ -167,6 +172,12 @@ if __name__ == '__main__':
             config[key]['config']['env_config']['random_target']=True
         else:
             config[key]['config']['env_config']['random_target'] = False
+
+        if args.color_free:
+            config[key]['config']['env_config']['color_free']=True
+        else:
+            config[key]['config']['env_config']['color_free'] = False
+
         if args.local:
             config[key]['config']['num_workers'] = 1
             config[key]['stop']['timesteps_total'] = 3000
