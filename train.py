@@ -146,7 +146,7 @@ if __name__ == '__main__':
     parser.add_argument('-f', type=str, help='file')
     parser.add_argument('--local', action='store_true', default=False)
     parser.add_argument('--wdb', action='store_true', default=True)
-    parser.add_argument('--rnd_goal', action='store_true', default=False)
+    parser.add_argument('--rnd_goal', action='store_true', default=True)
     parser.add_argument('--color_free', action='store_true', default=False)
     args = parser.parse_args()
     if args.local:
