@@ -102,9 +102,7 @@ def build_env(env_config=None, env_factory=None):
                num_colors=env_config['random_tasks'].get('num_colors', 1),
                max_cache=env_config['random_tasks'].get('max_cache', 0),
             ))
-        if env_config['random_target']:
-            print("\n RAND TARGET \n")
-            env = RandomTarget(env)
+
     else:
         env = env_factory()
     #env = Logger(env)
@@ -129,6 +127,9 @@ def build_env(env_config=None, env_factory=None):
             print("Color free")
         else:
             env = CompleteReward(env)
+    if env_config['random_target']:
+        print("\n RAND TARGET \n")
+        env = RandomTarget(env)
     env = TimeLimit(env, limit=env_config['time_limit'])
     return env
 
