@@ -29,7 +29,7 @@ from ray.rllib.evaluation.metrics import collect_episodes, summarize_episodes
 import datetime
 from model import GridBaselineModel, PovBaselineModel, LargePovBaselineModel
 from custom_tasks import make_3d_cube
-from one_block_wrapppers import CompleteReward, SizeLongReward
+from one_block_wrapppers import CompleteReward, SizeLongReward,RandomTarget
 
 logging.basicConfig(stream=sys.stdout)
 
@@ -102,6 +102,9 @@ def build_env(env_config=None, env_factory=None):
                num_colors=env_config['random_tasks'].get('num_colors', 1),
                max_cache=env_config['random_tasks'].get('max_cache', 0),
             ))
+        if env_config['random_target']:
+            print("\n RAND TARGET \n")
+            env = RandomTarget(env)
     else:
         env = env_factory()
     #env = Logger(env)
