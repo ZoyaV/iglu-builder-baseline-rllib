@@ -17,9 +17,11 @@ from wrappers import Wrapper
 
 class CompleteReward(gym.Wrapper):
     def check_complete(self, info):
-        res = info['target_grid'] - info['grid']
-        res[res < 0] = 0
-        return len(np.where(res != 0)[0]) == 0
+        roi = info['grid'][info['target_grid'] != 0]
+        tg = info['target_grid'][info['target_grid'] != 0]
+        res = np.sum(roi == tg)
+        # print(roi == tg)
+        return res != 0
 
     def step(self, action):
         obs, reward, done, info = super().step(action)
