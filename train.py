@@ -112,7 +112,7 @@ def build_env(env_config=None, env_factory=None):
     if env_config['visual']:
         if env_config['visual_type']=='one_block':
             env = VisualOneBlockObservationWrapper(env)
-        elif env_config['visual_type']=='grid_target':
+        elif env_config['visual_type']=='target_grid':
             env = VisualObservationWrapper(env, True)
         else:
             env = VisualObservationWrapper(env)
