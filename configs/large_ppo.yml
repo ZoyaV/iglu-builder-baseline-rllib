@@ -9,8 +9,9 @@ iglu-baseline:
         env_config: 
           action_space: human-level
           visual: true
-          one_block: false
+          visual_type: none #one_block, grig_target
           size_reward: true
+          success_rate: false
           time_limit: 500
           # possible values are: 'one_task', 'many_tasks', 'random_tasks'
           task_mode: one_task 

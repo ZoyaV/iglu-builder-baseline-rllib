@@ -110,8 +110,10 @@ def build_env(env_config=None, env_factory=None):
     # visual - pov + inventory + compass + target grid; 
     # vector: grid + position + inventory + target grid
     if env_config['visual']:
-        if env_config['one_block']:
+        if env_config['visual_type']=='one_block':
             env = VisualOneBlockObservationWrapper(env)
+        elif env_config['visual_type']=='grid_target':
+            env = VisualObservationWrapper(env, True)
         else:
             env = VisualObservationWrapper(env)
     else:

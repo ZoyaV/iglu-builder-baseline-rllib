@@ -9,7 +9,7 @@ iglu-baseline:
         env_config: 
           action_space: human-level
           visual: true
-          one_block: false
+          visual_type: none #one_block, grig_target
           size_reward: false
           success_rate: true
           time_limit: 500
