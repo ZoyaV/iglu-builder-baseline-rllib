@@ -358,16 +358,18 @@ class VideoLogger(Wrapper):
         # assuming dict
         self.flushed = False
         new_action = {}
-        for key in action:
-            new_action[key] = action[key]
-            if isinstance(new_action[key], np.ndarray):
-                new_action[key] = new_action[key].tolist()
+#         for key in action:
+#             new_action[key] = action[key]
+#             if isinstance(new_action[key], np.ndarray):
+#                 new_action[key] = new_action[key].tolist()
         obs, reward, done, info = super().step(action)
-        self.actions.append(new_action)
-        self.out.write(obs['pov'][..., ::-1])
+        self.actions.append(action)
+        self.out.write(obs['pov'][:,:, ::-1].astype(np.uint8))
         self.obs.append({k: v for k, v in obs.items() if k != 'pov'})
         self.obs[-1]['reward'] = reward
         self.running_reward += reward
+        if done:
+            self.out.release()
         return obs, reward, done, info
 
 
