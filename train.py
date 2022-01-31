@@ -141,6 +141,7 @@ if __name__ == '__main__':
     parser.add_argument('-f', type=str, help='file')
     parser.add_argument('--local', action='store_true', default=False)
     parser.add_argument('--wdb', action='store_true', default=True)
+    parser.add_argument('--rnd_goal', action='store_true', default=False)
     args = parser.parse_args()
     if args.local:
         ray.init(local_mode=True)
@@ -162,6 +163,8 @@ if __name__ == '__main__':
         print(config)
         del config[key]['env'], config[key]['run']
         config[key]['config']['custom_eval_function'] = evaluate_separately
+        if args.rnd_goal:
+            config[key]['config']['env_config']['random_target']=True
         if args.local:
             config[key]['config']['num_workers'] = 1
             config[key]['stop']['timesteps_total'] = 3000
