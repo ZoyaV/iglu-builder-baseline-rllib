@@ -496,6 +496,7 @@ class VisualObservationWrapper(ObsWrapper):
             'inventory': gym.spaces.Box(low=0.0, high=20.0, shape=(6,)),
             'compass': gym.spaces.Box(low=-180.0, high=180.0, shape=(1,))
         }
+        self.include_target = include_target
         if include_target:
             self.observation_space['target_grid'] = \
                 gym.spaces.Box(low=0, high=6, shape=(9, 11, 11))
@@ -513,11 +514,15 @@ class VisualObservationWrapper(ObsWrapper):
                 target_grid = self.env.unwrapped.tasks.current.target_grid
         else:
             target_grid = self.env.unwrapped.tasks.current.target_grid
-        return {
+
+        observe = {
             'pov': obs['pov'].astype(np.float32),
             'inventory': obs['inventory'],
             'compass': np.array([obs['compass']['angle'].item()])
-        }
+            }
+        if self.include_target:
+            observe['target_grid'] = target_grid
+        return observe
 
 
 class VectorObservationWrapper(ObsWrapper):
