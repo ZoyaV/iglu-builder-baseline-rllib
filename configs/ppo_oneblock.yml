@@ -15,7 +15,6 @@ iglu-baseline:
           time_limit: 500
           # possible values are: 'one_task', 'many_tasks', 'random_tasks'
           task_mode: custom_task
-          random_target: true
           # if task_mode is one_task -> string with task id
           # if task_mode is many_tasks -> list of task ids
           # if task_mode is random_tasks -> ignored

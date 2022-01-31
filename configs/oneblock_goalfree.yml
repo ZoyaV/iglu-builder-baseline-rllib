@@ -13,7 +13,7 @@ iglu-baseline:
           size_reward: false
           success_rate: true
           time_limit: 500
-          random_target: false
+
           # possible values are: 'one_task', 'many_tasks', 'random_tasks'
           task_mode: custom_task
           # if task_mode is one_task -> string with task id
