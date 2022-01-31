@@ -38,9 +38,8 @@ class CompleteReward(gym.Wrapper):
 
     def check_complete(self, info):
         if self.color_free:
-            res = info['target_grid'] - info['grid']
-            res[res < 0] = 0
-            return len(np.where(res != 0)[0]) == 0
+            roi = info['grid'][info['target_grid'] != 0]
+            return len(np.where(roi != 0)[0]) == 0
         else:
             roi = info['grid'][info['target_grid'] != 0]
             tg = info['target_grid'][info['target_grid'] != 0]
