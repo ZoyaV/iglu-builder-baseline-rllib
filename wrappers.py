@@ -235,6 +235,9 @@ class FakeIglu(gym.Env):
     def __init__(self, config, wrap_actions=True):
         action_space = config.get('action_space')
         visual = config.get('visual')
+        visual_type = config.get('visual_type')
+        if visual_type == 'target_grid':
+            self.target_grid = True
         if action_space == 'human-level':
             self.action_space = spaces.Dict({
                 'forward': spaces.Discrete(2),
@@ -273,11 +276,15 @@ class FakeIglu(gym.Env):
             self.full_action_space = self.action_space
             self.action_space = spaces.Discrete(len(self.discrete))
         if visual:
-            self.observation_space = spaces.Dict({
+            obs = {
                 'pov': spaces.Box(0, 255, (64, 64, 3), dtype=np.float32),
                 'inventory': spaces.Box(low=0, high=20, shape=(6,), dtype=np.float32),
                 'compass': spaces.Box(low=-180.0, high=180.0, shape=(1,), dtype=np.float32),
-            })
+            }
+            if self.target_grid:
+                obs['target_grid'] = gym.spaces.Box(low=0.0, high=6.0, shape=(9, 11, 11))
+            self.observation_space = spaces.Dict(obs)
+
         else:
             self.observation_space = spaces.Dict({
                 'agentPos': gym.spaces.Box(low=-5000.0, high=5000.0, shape=(5,)),
@@ -288,9 +295,9 @@ class FakeIglu(gym.Env):
         self.step = 0
 
     def reset(self):
-        self.step = 0 
+        self.step = 0
         return self.observation_space.sample()
-  
+
     def step(self, action):
         self.step += 1
         done = self.step >= 1000
