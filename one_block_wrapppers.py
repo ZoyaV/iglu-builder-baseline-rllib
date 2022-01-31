@@ -14,6 +14,22 @@ from collections import defaultdict
 from typing import Generator
 from minerl_patched.herobraine.hero import spaces
 from wrappers import Wrapper
+from custom_tasks import make_3d_cube
+
+class RandomTarget(gym.Wrapper):
+    TOTAL_REWARD = 0
+    def __init__(self, env, thresh = 0.67):
+        super().__init__(env)
+        self.thresh = thresh
+
+    def step(self, action):
+        obs, reward, done, info = super().step(action)
+        self.TOTAL_REWARD+=reward
+        self.TOTAL_REWARD/=2
+        if self.TOTAL_REWARD > self.thresh:
+            self.update_taskset(make_3d_cube(rand=True))
+            info['new_env'] = True
+        return  obs, reward, done, info
 
 class CompleteReward(gym.Wrapper):
     def check_complete(self, info):

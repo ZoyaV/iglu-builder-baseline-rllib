@@ -1,11 +1,19 @@
 import gym
 import numpy as np
 from iglu.tasks import CustomTasks
+import random
 
-
-def make_3d_cube():
+def make_3d_cube(rand = False):
     custom_grid = np.zeros((9, 11, 11)) # (y, x, z)
-    custom_grid[0, 5, 5] = 1 # blue color
+    if rand:
+        x = random.randint(0,10)
+        y = random.randint(0,10)
+        #z = random.randint(0, 8)
+    else:
+        x = 5
+        y = 5
+    z = 0
+    custom_grid[z, x, y] = 1 # blue color
     return CustomTasks([
         ('<Architect> Please, build a stack of three blue blocks somewhere.\n'
          '<Builder> Sure.',
