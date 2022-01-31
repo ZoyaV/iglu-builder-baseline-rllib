@@ -122,10 +122,10 @@ def build_env(env_config=None, env_factory=None):
     if env_config.get('size_reward', False):
         env = SizeReward(env)
     if env_config.get('success_rate', False):
-        if env_config['color_free']:
-            env = CompleteReward(env, color_free=True)
-            print("Color free")
-        else:
+       # if env_config['color_free']:
+         #   env = CompleteReward(env, color_free=True)
+          #  print("Color free")
+       # else:
             env = CompleteReward(env)
     if env_config['random_target']:
         print("\n RAND TARGET \n")
