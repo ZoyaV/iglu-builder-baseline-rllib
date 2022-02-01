@@ -20,13 +20,18 @@ class RandomTarget(gym.Wrapper):
     def __init__(self, env, thresh = 0.67):
         super().__init__(env)
         self.thresh = thresh
-        self.total_reward = self.thresh/10
+        self.total_reward = 0
+        self.sum = self.thresh/10
+        self.count = 0
 
     def step(self, action):
         obs, reward, done, info = super().step(action)
         if done:
-            self.total_reward+=reward
-            self.total_reward/=2
+            self.count += 1
+            self.sum += done
+            self.total_reward = self.sum/ self.count
+           # self.total_reward+=reward
+            #self.total_reward/=2
         if self.total_reward > self.thresh:
             self.update_taskset(make_3d_cube(rand=True))
             self.total_reward = self.thresh / 10
