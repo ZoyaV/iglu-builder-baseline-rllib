@@ -127,10 +127,11 @@ def build_env(env_config=None, env_factory=None):
           #  print("Color free")
        # else:
             env = CompleteReward(env)
+
+    env = TimeLimit(env, limit=env_config['time_limit'])
     if env_config['random_target']:
         print("\n RAND TARGET \n")
         env = RandomTarget(env)
-    env = TimeLimit(env, limit=env_config['time_limit'])
     return env
 
 def register_models():
