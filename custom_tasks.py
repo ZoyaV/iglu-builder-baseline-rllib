@@ -13,6 +13,8 @@ def make_3d_cube(rand = False):
         x = 5
         y = 5
     z = 0
+    print("\n CHANGE TASK \n", x,y,z)
+    print(z,x,y)
     custom_grid[z, x, y] = 1 # blue color
     return CustomTasks([
         ('<Architect> Please, build a stack of three blue blocks somewhere.\n'

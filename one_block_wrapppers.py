@@ -34,6 +34,8 @@ class RandomTarget(gym.Wrapper):
             #self.total_reward/=2
         if self.total_reward > self.thresh:
             self.update_taskset(make_3d_cube(rand=True))
+            self.sum = self.thresh / 10
+            self.count = 0
             self.total_reward = self.thresh / 10
             info['new_env'] = True
         return  obs, reward, done, info
