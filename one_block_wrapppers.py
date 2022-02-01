@@ -40,7 +40,7 @@ class RandomTarget(gym.Wrapper):
                 task = make_3d_cube(rand=True)
                 self.current_env.append(task)
             else:
-                task = self.current_env[self.changes]
+                task = self.current_env[self.changes-1]
 
             self.update_taskset(task)
             self.sum = self.thresh / 10
