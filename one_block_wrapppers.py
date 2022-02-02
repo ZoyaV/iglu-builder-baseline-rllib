@@ -17,7 +17,7 @@ from wrappers import Wrapper
 from custom_tasks import make_3d_cube
 
 class RandomTarget(gym.Wrapper):
-    current_env  = [[None]]
+    #current_env  = [[None]]
     def __init__(self, env, thresh = 0.67):
         super().__init__(env)
         self.thresh = thresh
@@ -32,16 +32,13 @@ class RandomTarget(gym.Wrapper):
             self.count += 1
             self.sum += reward
             self.total_reward = self.sum/ self.count
-           # self.total_reward+=reward
-            #self.total_reward/=2
-        if self.total_reward > self.thresh:
-            self.changes += 1
-            if len(self.current_env) == self.changes:
-                task = make_3d_cube(rand=True)
-                self.current_env.append(task)
-            else:
-                task = self.current_env[self.changes-1]
 
+        if self.total_reward > self.thresh:
+
+            print("\n ----Make new Goal ----- \n")
+            self.changes += 1
+            task = make_3d_cube(rand=True)
+            self.current_env.append(task)
             self.update_taskset(task)
             self.sum = self.thresh / 10
             self.count = 0

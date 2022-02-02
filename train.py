@@ -92,7 +92,7 @@ def build_env(env_config=None, env_factory=None):
         elif env_config['task_mode'] == 'many_tasks':
             env.update_taskset(TaskSet(preset=env_config['task_id']))
         elif env_config['task_mode'] == 'custom_task':
-            env.update_taskset(make_3d_cube())
+            env.update_taskset(make_3d_cube(rand=True))
         elif env_config['task_mode'] == 'random_tasks':
             env.update_taskset(RandomTasks(
                max_blocks=env_config['random_tasks'].get('max_blocks', 3),
