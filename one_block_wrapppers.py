@@ -32,7 +32,12 @@ class RandomTarget(gym.Wrapper):
             self.count += 1
             self.sum += reward
             self.total_reward = self.sum/ self.count
-
+            print("\n --- upd reward ---- \n")
+            print("reward = ",self.total_reward)
+            print("sum = ", self.sum)
+            print("count = ", self.count)
+            print(" --- upd reward ---- \n")
+            
         if self.total_reward > self.thresh:
 
             print("\n ----Make new Goal ----- \n")
