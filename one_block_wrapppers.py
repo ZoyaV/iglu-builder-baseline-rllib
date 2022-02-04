@@ -18,7 +18,7 @@ from custom_tasks import make_3d_cube
 
 class RandomTarget(gym.Wrapper):
     #current_env  = [[None]]
-    def __init__(self, env, thresh = 0.67):
+    def __init__(self, env, thresh = 0.37):
         super().__init__(env)
         self.thresh = thresh
         self.total_reward = 0
@@ -27,13 +27,21 @@ class RandomTarget(gym.Wrapper):
         self.changes = 0
 
     def step(self, action):
-        obs, reward, done, info = super().step(action)
+        obs, reward, done, info = self.env.step(action)
         if done:
             self.count += 1
             self.sum += reward
             self.total_reward = self.sum/ self.count
+            print("\n --- upd reward ---- \n")
+            print("blocks count = ", len(np.where(info['grid']!=0)[0]))
+            print("reward = ",self.total_reward)
+            print("sum = ", self.sum)
+            print("count = ", self.count)
+            print(" --- upd reward ---- \n")
 
-            if (self.total_reward > self.thresh) or (self.total_reward < 0.0005):
+            if (self.total_reward > self.thresh) or (self.total_reward < 0.001):
+
+                print("\n ----Make new Goal ----- \n")
                 self.changes += 1
                 task = make_3d_cube(rand=True)
                 self.update_taskset(task)
