@@ -10,6 +10,7 @@ from collections import defaultdict
 from filelock import FileLock
 from iglu.tasks import RandomTasks, TaskSet
 from ray.rllib.execution.common import AGENT_STEPS_SAMPLED_COUNTER,_get_shared_metrics
+import ray.tune.ray_trial_executor as trial_vars
 from ray import tune
 from ray.rllib.models import ModelCatalog
 from ray.tune.logger import DEFAULT_LOGGERS
@@ -34,6 +35,10 @@ from one_block_wrapppers import CompleteReward, SizeLongReward,RandomTarget
 logging.basicConfig(stream=sys.stdout)
 
 start = datetime.datetime.now()
+
+print(trial_vars.DEFAULT_GET_TIMEOUT)
+trial_vars.DEFAULT_GET_TIMEOUT = 120.0
+print(trial_vars.DEFAULT_GET_TIMEOUT)
 
 os.environ['WANDB_APIKEY'] = "e5ac79d62944a4e1910f83da82ae92c37b09ecdf"
 def evaluate_separately(trainer, eval_workers):
