@@ -32,24 +32,15 @@ class RandomTarget(gym.Wrapper):
             self.count += 1
             self.sum += reward
             self.total_reward = self.sum/ self.count
-            print("\n --- upd reward ---- \n")
-            print("blocks count = ", len(np.where(info['grid']!=0)[0]))
-            print("reward = ",self.total_reward)
-            print("sum = ", self.sum)
-            print("count = ", self.count)
-            print(" --- upd reward ---- \n")
 
-        if (self.total_reward > self.thresh) or (self.total_reward < 0.0005):
-
-            print("\n ----Make new Goal ----- \n")
-            self.changes += 1
-            task = make_3d_cube(rand=True)
-            #self.current_env.append(task)
-            self.update_taskset(task)
-            self.sum = self.thresh / 10
-            self.count = 0
-            self.total_reward = self.thresh / 10
-            info['new_env'] = True
+            if (self.total_reward > self.thresh) or (self.total_reward < 0.0005):
+                self.changes += 1
+                task = make_3d_cube(rand=True)
+                self.update_taskset(task)
+                self.sum = self.thresh / 10
+                self.count = 0
+                self.total_reward = self.thresh / 10
+                info['new_env'] = True
         return  obs, reward, done, info
 
 class CompleteReward(gym.Wrapper):
