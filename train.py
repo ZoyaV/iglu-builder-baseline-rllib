@@ -29,6 +29,7 @@ from wrappers import \
 from ray.rllib.evaluation.metrics import collect_episodes, summarize_episodes
 import datetime
 from model import GridBaselineModel, PovBaselineModel, LargePovBaselineModel
+from model_with_target import PovBaselineModelTarget, LargePovBaselineModelTarget
 from custom_tasks import make_3d_cube
 from one_block_wrapppers import CompleteReward, SizeLongReward,RandomTarget
 
@@ -146,6 +147,10 @@ def register_models():
         "pov_baseline_model", PovBaselineModel)
     ModelCatalog.register_custom_model(
         "large_pov_baseline_model", LargePovBaselineModel)
+    ModelCatalog.register_custom_model(
+        "pov_baseline_target_model", PovBaselineModelTarget)
+    ModelCatalog.register_custom_model(
+        "large_pov_baseline_target_model", LargePovBaselineModelTarget)
 
 if __name__ == '__main__':
     parser = ArgumentParser()

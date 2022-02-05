@@ -49,7 +49,6 @@ class LargePovBaselineModel(TorchModelV2, nn.Module):
             num_outputs = int(np.product(self.obs_space.shape))
         pov_embed_size = 128
         inv_emded_size = 128
-        target_emded_size = 128
         embed_size = 128 * 2
 
         self.conv3x3 = nn.Conv2d(3, 64, 3, stride=1)
@@ -66,14 +65,8 @@ class LargePovBaselineModel(TorchModelV2, nn.Module):
             nn.Linear(inv_emded_size, inv_emded_size),
             nn.ReLU(),
         )
-        self.target_grid_emb = nn.Sequential(
-            nn.Linear(9*11*11, inv_emded_size),
-            nn.ReLU(),
-            nn.Linear(inv_emded_size, inv_emded_size),
-            nn.ReLU(),
-        )
         self.head = nn.Sequential(
-            nn.Linear(pov_embed_size + inv_emded_size + target_emded_size, embed_size),
+            nn.Linear(pov_embed_size + inv_emded_size, embed_size),
             nn.ReLU(),
             nn.Linear(embed_size, embed_size),
             nn.ReLU(),
@@ -84,35 +77,19 @@ class LargePovBaselineModel(TorchModelV2, nn.Module):
         obs = input_dict['obs']
         pov = obs['pov'] / 255. - 0.5
         pov = pov.transpose(2, 3).transpose(1, 2).contiguous()
-        #  print("Before ", pov.shape)
         pov_embed = self.conv3x3(pov)
         pov_embed = self.relu1(pov_embed)
         pov_embed = self.conv3x3_2(pov_embed)
-        # print("After conv", pov_embed.shape)
         pov_embed = self.max_pull(pov_embed)
-        #  print("After max_pull ", pov_embed.shape)
         pov_embed = self.res_block_1(pov_embed)
-        #  print("Resudual 1", pov_embed.shape)
         pov_embed = self.res_block_2(pov_embed)
-        #  print("Resudual 2", pov_embed.shape)
         pov_embed = pov_embed.mean(axis=2)
         pov_embed = pov_embed.mean(axis=2)
         pov_embed = pov_embed.reshape(pov_embed.shape[0], -1)
-        #  print("After reshape", pov_embed.shape)
-        tg = obs['target_grid']/6
-        tg = tg.reshape(tg.shape[0], -1)
-        tg_embed = self.target_grid_emb(tg)
-
         inventory_compass = torch.cat([obs['inventory'], obs['compass']], 1)
         inv_comp_emb = self.inventory_compass_emb(inventory_compass)
-        # print("Compas ", inv_comp_emb.shape)
-        #  mean = nn.AvgPool2d(inv_comp_emb.shape, stride=1)
-        #  pov_embed = pov_embed.mean(axis = 1)
-        # pov_embed = torch.max(pov_embed, axis = 1)
-        head_input = torch.cat([pov_embed, inv_comp_emb,tg_embed], 1)
-        # print("no problem")
+        head_input = torch.cat([pov_embed, inv_comp_emb,], 1)
         return self.head(head_input), state
-
 
 class PovBaselineModel(TorchModelV2, nn.Module):
     def __init__(self, obs_space, action_space, num_outputs, model_config,
