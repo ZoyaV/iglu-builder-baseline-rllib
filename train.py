@@ -136,7 +136,7 @@ def build_env(env_config=None, env_factory=None):
     env = TimeLimit(env, limit=env_config['time_limit'])
     if env_config['random_target']:
         print("\n RAND TARGET \n")
-        env = RandomTarget(env)
+      #  env = RandomTarget(env)
     return env
 
 def register_models():
