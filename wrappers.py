@@ -90,6 +90,25 @@ class TimeLimit(Wrapper):
             done = True
         return obs, reward, done, info
 
+class CompleteReward(Wrapper):
+    def __init__(self, env):
+        super().__init__(env)
+
+    def reset(self):
+        return super().reset()
+
+    def check_complete(self, info):
+        roi = info['grid'][info['target_grid'] != 0]
+        return len(np.where(roi != 0)[0]) > 0
+
+    def step(self, action):
+        obs, reward, done, info = super().step(action)
+        done = self.check_complete(info)
+        if done:
+            reward = 1
+        else:
+            reward = 0
+        return obs, reward, done, info
 
 
 class SizeReward(Wrapper):

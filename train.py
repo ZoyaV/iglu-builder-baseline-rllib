@@ -25,13 +25,14 @@ from wrappers import \
     VectorObservationWrapper, \
     VisualObservationWrapper, \
     VisualOneBlockObservationWrapper, \
+    CompleteReward, \
     Logger
 from ray.rllib.evaluation.metrics import collect_episodes, summarize_episodes
 import datetime
 from model import GridBaselineModel, PovBaselineModel, LargePovBaselineModel
 from model_with_target import PovBaselineModelTarget, LargePovBaselineModelTarget
 from custom_tasks import make_3d_cube
-from one_block_wrapppers import CompleteReward, SizeLongReward,RandomTarget
+from one_block_wrapppers import  SizeLongReward,RandomTarget
 
 logging.basicConfig(stream=sys.stdout)
 
