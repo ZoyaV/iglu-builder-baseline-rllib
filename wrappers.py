@@ -103,9 +103,10 @@ class CompleteReward(Wrapper):
 
     def step(self, action):
         obs, reward, done, info = super().step(action)
-        done = self.check_complete(info)
-        if done:
+        check_sr = self.check_complete(info)
+        if check_sr:
             reward = 1
+            done = True
         else:
             reward = 0
         return obs, reward, done, info
