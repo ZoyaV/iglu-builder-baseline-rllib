@@ -102,10 +102,10 @@ def build_env(env_config=None, env_factory=None):
             env.update_taskset(make_3d_cube(rand=True))
         elif env_config['task_mode'] == 'random_tasks':
             env.update_taskset(RandomTasks(
-               max_blocks=env_config['random_tasks'].get('max_blocks', 3),
+               max_blocks=env_config['random_tasks'].get('max_blocks', 1),
                height_levels=env_config['random_tasks'].get('height_levels', 1),
                allow_float=env_config['random_tasks'].get('allow_float', False),
-               max_dist=env_config['random_tasks'].get('max_dist', 2),
+               max_dist=env_config['random_tasks'].get('max_dist', 5),
                num_colors=env_config['random_tasks'].get('num_colors', 1),
                max_cache=env_config['random_tasks'].get('max_cache', 0),
             ))

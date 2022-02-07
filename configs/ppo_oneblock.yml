@@ -2,7 +2,7 @@ iglu-baseline:
     env: IGLUSilentBuilder-v0
     run: PPO
     stop:
-        timesteps_total: 850000
+        timesteps_total: 9850000
     checkpoint_at_end: True
     checkpoint_freq: 10 # roughly each 50k steps
     config:
@@ -21,14 +21,14 @@ iglu-baseline:
           task_id: C34
           # only used if task_mode is random_tasks
           random_tasks:
-            max_blocks: 20
-            height_levels: 2
+            max_blocks: 1
+            height_levels: 1
             allow_float: false
-            max_dist: 7
-            num_colors: 6
+            max_dist: 5
+            num_colors: 1
             max_cache: 1
         model:
-          custom_model: large_pov_baseline_model
+          custom_model: pov_baseline_taret_model
           use_lstm: True
         framework: torch
         #vtrace: True
