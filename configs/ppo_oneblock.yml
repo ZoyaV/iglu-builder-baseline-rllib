@@ -14,7 +14,7 @@ iglu-baseline:
           success_rate: true
           time_limit: 500
           # possible values are: 'one_task', 'many_tasks', 'random_tasks'
-          task_mode: custom_task
+          task_mode: random_task
           # if task_mode is one_task -> string with task id
           # if task_mode is many_tasks -> list of task ids
           # if task_mode is random_tasks -> ignored
@@ -24,9 +24,9 @@ iglu-baseline:
             max_blocks: 1
             height_levels: 1
             allow_float: false
-            max_dist: 5
+            max_dist: 1
             num_colors: 1
-            max_cache: 1
+            max_cache: 0
         model:
           custom_model: pov_baseline_taret_model
           use_lstm: True

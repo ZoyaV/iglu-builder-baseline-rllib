@@ -99,7 +99,7 @@ class CompleteReward(Wrapper):
 
     def check_complete(self, info):
         roi = info['grid'][info['target_grid'] != 0]
-        return len(np.where(roi != 0)[0]) > 0
+        return len(np.where(roi != 0)[0]) > 0 #TODO: fix roi == 0  to != 0
 
     def step(self, action):
         obs, reward, done, info = super().step(action)
@@ -109,6 +109,24 @@ class CompleteReward(Wrapper):
             done = True
         else:
             reward = 0
+        return obs, reward, done, info
+
+class CompleteScold(Wrapper):
+    def __init__(self, env):
+        super().__init__(env)
+
+    def reset(self):
+        return super().reset()
+
+    def check_filling(self, info):
+        roi = info['grid'][info['target_grid'] == 0]
+        return len(np.where(roi != 0)[0]) > 0
+
+    def step(self, action):
+        obs, reward, done, info = super().step(action)
+        check_fill = self.check_filling(info)
+        if check_fill:
+            done = True
         return obs, reward, done, info
 
 

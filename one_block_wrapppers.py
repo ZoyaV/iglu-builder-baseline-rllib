@@ -19,7 +19,7 @@ from iglu.tasks import RandomTasks
 
 class RandomTarget(gym.Wrapper):
     #current_env  = [[None]]
-    def __init__(self, env, thresh = 0.67):
+    def __init__(self, env, thresh = 0.77):
         super().__init__(env)
         self.thresh = thresh
         self.total_reward = 0
@@ -48,7 +48,7 @@ class RandomTarget(gym.Wrapper):
                            max_blocks=1,
                            height_levels=1,
                            allow_float= False,
-                           max_dist= 5,
+                           max_dist= 1,
                            num_colors= 1,
                            max_cache=0,
                         )

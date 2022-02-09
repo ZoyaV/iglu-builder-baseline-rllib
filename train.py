@@ -26,6 +26,7 @@ from wrappers import \
     VisualObservationWrapper, \
     VisualOneBlockObservationWrapper, \
     CompleteReward, \
+    CompleteScold, \
     Logger
 from ray.rllib.evaluation.metrics import collect_episodes, summarize_episodes
 import datetime
@@ -100,12 +101,12 @@ def build_env(env_config=None, env_factory=None):
             env.update_taskset(TaskSet(preset=env_config['task_id']))
         elif env_config['task_mode'] == 'custom_task':
             env.update_taskset(make_3d_cube(rand=True))
-        elif env_config['task_mode'] == 'random_tasks':
+        elif env_config['task_mode'] == 'random_task':
             env.update_taskset(RandomTasks(
                max_blocks=env_config['random_tasks'].get('max_blocks', 1),
                height_levels=env_config['random_tasks'].get('height_levels', 1),
                allow_float=env_config['random_tasks'].get('allow_float', False),
-               max_dist=env_config['random_tasks'].get('max_dist', 5),
+               max_dist=env_config['random_tasks'].get('max_dist', 1),
                num_colors=env_config['random_tasks'].get('num_colors', 1),
                max_cache=env_config['random_tasks'].get('max_cache', 0),
             ))
@@ -129,16 +130,16 @@ def build_env(env_config=None, env_factory=None):
     if env_config.get('size_reward', False):
         env = SizeReward(env)
     if env_config.get('success_rate', False):
-       # if env_config['color_free']:
-         #   env = CompleteReward(env, color_free=True)
-          #  print("Color free")
-       # else:
             env = CompleteReward(env)
-
     env = TimeLimit(env, limit=env_config['time_limit'])
-    if env_config['random_target']:
+    rand_init = False if 'random_target' not in env_config else env_config['random_target']
+    cs_init = False if 'complete_scold' not in env_config else env_config['complete_scold'] #CompleteScold
+    if cs_init:
+        print("\n RC \n")
+        env = CompleteScold(env)
+    if rand_init:
         print("\n RAND TARGET \n")
-    env = RandomTarget(env)
+        env = RandomTarget(env)
     return env
 
 def register_models():
@@ -160,6 +161,7 @@ if __name__ == '__main__':
     parser.add_argument('--wdb', action='store_true', default=True)
     parser.add_argument('--rnd_goal', action='store_true', default=True)
     parser.add_argument('--color_free', action='store_true', default=False)
+    parser.add_argument('--complete_scold', action='store_true', default=False) #complete scold
     args = parser.parse_args()
     if args.local:
         ray.init(local_mode=True)
