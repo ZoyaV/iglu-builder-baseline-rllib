@@ -50,7 +50,7 @@ class LargePovBaselineModelTarget(TorchModelV2, nn.Module):
         pov_embed_size = 128
         inv_emded_size = 128
         target_emded_size = 128
-        embed_size = 128 * 2
+        embed_size = 128 * 3
 
         self.conv3x3 = nn.Conv2d(3, 64, 3, stride=1)
         self.relu1 = nn.ReLU()
@@ -67,9 +67,9 @@ class LargePovBaselineModelTarget(TorchModelV2, nn.Module):
             nn.ReLU(),
         )
         self.target_grid_emb = nn.Sequential(
-            nn.Linear(9*11*11, inv_emded_size),
+            nn.Linear(9*11*11, target_emded_size),
             nn.ReLU(),
-            nn.Linear(inv_emded_size, inv_emded_size),
+            nn.Linear(target_emded_size, target_emded_size),
             nn.ReLU(),
         )
         self.head = nn.Sequential(
