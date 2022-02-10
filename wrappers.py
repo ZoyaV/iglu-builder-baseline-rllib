@@ -70,6 +70,7 @@ class ObsWrapper(Wrapper):
     def step(self, action):
         obs, reward, done, info = super().step(action)
         info['grid'] = obs['grid']
+        info['agentPos'] = obs['agentPos']
         return self.observation(obs, reward, done, info), reward, done, info
 
 
@@ -551,6 +552,7 @@ class VisualObservationWrapper(ObsWrapper):
 
     def observation(self, obs, reward=None, done=None, info=None):
         if info is not None:
+
             if 'target_grid' in info:
                 target_grid = info['target_grid']
                 #del info['target_grid']
