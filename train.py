@@ -45,22 +45,23 @@ print(trial_vars.DEFAULT_GET_TIMEOUT)
 
 os.environ['WANDB_APIKEY'] = "e5ac79d62944a4e1910f83da82ae92c37b09ecdf"
 def evaluate_separately(trainer, eval_workers):
-    w = next(iter(eval_workers.remote_workers()))
-    env_ids = ray.get(w.foreach_env.remote(lambda env: list(env.tasks.preset.keys())))[0]
-    print(f'env id: {env_ids}')
-    i = 0
-    all_episodes = []
-    while i < len(env_ids):
-        for w in eval_workers.remote_workers():
-            w.foreach_env.remote(lambda env: env.set_task(env_ids[i]))
-            i += 1
-        ray.get([w.sample.remote() for w in eval_workers.remote_workers()])
-        episodes, _ = collect_episodes(
-            remote_workers=eval_workers.remote_workers(), timeout_seconds=99999)
-        all_episodes += episodes
-    metrics = summarize_episodes(episodes)
-    for eid, ep in zip(env_ids, all_episodes):
-        metrics[f'env_{eid}_reward'] = ep.episode_reward
+    # w = next(iter(eval_workers.remote_workers()))
+    # env_ids = ray.get(w.foreach_env.remote(lambda env: list(env.tasks.preset.keys())))[0]
+    # print(f'env id: {env_ids}')
+    # i = 0
+    # all_episodes = []
+    # while i < len(env_ids):
+    #     for w in eval_workers.remote_workers():
+    #         w.foreach_env.remote(lambda env: env.set_task(env_ids[i]))
+    #         i += 1
+    #     ray.get([w.sample.remote() for w in eval_workers.remote_workers()])
+    #     episodes, _ = collect_episodes(
+    #         remote_workers=eval_workers.remote_workers(), timeout_seconds=99999)
+    #     all_episodes += episodes
+    # metrics = summarize_episodes(episodes)
+    # for eid, ep in zip(env_ids, all_episodes):
+    #     metrics[f'env_{eid}_reward'] = ep.episode_reward
+    metrics = {}
     end = datetime.datetime.now()
     METRIX = _get_shared_metrics()
     total_ts = METRIX.counters.get( AGENT_STEPS_SAMPLED_COUNTER, 0)
@@ -132,10 +133,10 @@ def build_env(env_config=None, env_factory=None):
     if env_config.get('success_rate', False):
             env = CompleteReward(env)
     env = TimeLimit(env, limit=env_config['time_limit'])
-    rand_init = False if 'random_target' not in env_config else env_config['random_target']
-    cs_init = False if 'complete_scold' not in env_config else env_config['complete_scold'] #CompleteScold
+    rand_init = True if 'random_target' not in env_config else env_config['random_target']
+    cs_init = True if 'complete_scold' not in env_config else env_config['complete_scold'] #CompleteScold
     if cs_init:
-        print("\n RC \n")
+        print("\n Complete Scold \n")
         env = CompleteScold(env)
     if rand_init:
         print("\n RAND TARGET \n")
@@ -183,10 +184,16 @@ if __name__ == '__main__':
         print(config)
         del config[key]['env'], config[key]['run']
         config[key]['config']['custom_eval_function'] = evaluate_separately
+
         if args.rnd_goal:
             config[key]['config']['env_config']['random_target']=True
         else:
             config[key]['config']['env_config']['random_target'] = False
+
+        if args.complete_scold:
+            config[key]['config']['env_config']['complete_scold']=True
+        else:
+            config[key]['config']['env_config']['complete_scold'] = False
 
         if args.color_free:
             config[key]['config']['env_config']['color_free']=True

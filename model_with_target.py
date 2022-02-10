@@ -94,14 +94,14 @@ class LargePovBaselineModelTarget(TorchModelV2, nn.Module):
         pov_embed = pov_embed.mean(axis=2)
         pov_embed = pov_embed.reshape(pov_embed.shape[0], -1)
 
-        tg = obs['target_grid']/6
+        tg = obs['target_grid']
         tg = tg.reshape(tg.shape[0], -1)
         tg_embed = self.target_grid_emb(tg)
 
-        inventory_compass = torch.cat([obs['inventory'], obs['compass']], 1)
+        inventory_compass = torch.cat([obs['inventory'], obs['compass']], -1)
         inv_comp_emb = self.inventory_compass_emb(inventory_compass)
 
-        head_input = torch.cat([pov_embed, inv_comp_emb,tg_embed], 1)
+        head_input = torch.cat([pov_embed, inv_comp_emb,tg_embed], -1)
 
         return self.head(head_input), state
 
@@ -155,13 +155,13 @@ class PovBaselineModelTarget(TorchModelV2, nn.Module):
         pov_embed = self.pov_embed(pov)
         pov_embed = pov_embed.reshape(pov_embed.shape[0], -1)
 
-        inventory_compass = torch.cat([obs['inventory'], obs['compass']], 1)
+        inventory_compass = torch.cat([obs['inventory'], obs['compass']], -1)
         inv_comp_emb = self.inventory_compass_emb(inventory_compass)
 
 
-        tg = obs['target_grid'] / 6
+        tg = obs['target_grid']
         tg = tg.reshape(tg.shape[0], -1)
         tg_embed = self.target_grid_emb(tg)
 
-        head_input = torch.cat([pov_embed, inv_comp_emb, tg_embed], 1)
+        head_input = torch.cat([pov_embed, inv_comp_emb, tg_embed], -1)
         return self.head(head_input), state
