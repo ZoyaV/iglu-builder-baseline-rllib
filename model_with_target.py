@@ -88,8 +88,10 @@ class LargePovBaselineModelTarget(TorchModelV2, nn.Module):
         pov_embed = self.relu1(pov_embed)
         pov_embed = self.conv3x3_2(pov_embed)
         pov_embed = self.max_pull(pov_embed)
+
         pov_embed = self.res_block_1(pov_embed)
         pov_embed = self.res_block_2(pov_embed)
+
         pov_embed = pov_embed.mean(axis=2)
         pov_embed = pov_embed.mean(axis=2)
         pov_embed = pov_embed.reshape(pov_embed.shape[0], -1)

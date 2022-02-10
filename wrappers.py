@@ -112,6 +112,27 @@ class CompleteReward(Wrapper):
             reward = 0
         return obs, reward, done, info
 
+class Closeness(Wrapper):
+    def __init__(self, env):
+        super().__init__(env)
+        self.dist = 1000000
+
+    def closeness(self, info):
+        roi_target = np.where(info['target_grid'] != 0)
+        position = info['agentPos']
+        goal = roi_target[0,0],roi_target[1,0]
+        dist = ((goal[0] - position[0])**2 + (goal[1] - position[1])**2)
+        return dist
+
+    def calc_reward(self, info):
+        d2 = self.closeness(info)
+        if self.dist > d2:
+            self.dist = d2
+            return 0.01
+        else:
+            self.dist = 0
+            return 0
+
 class CompleteScold(Wrapper):
     def __init__(self, env):
         super().__init__(env)
