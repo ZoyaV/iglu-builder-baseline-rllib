@@ -27,6 +27,7 @@ from wrappers import \
     VisualOneBlockObservationWrapper, \
     CompleteReward, \
     CompleteScold, \
+    Closeness, \
     Logger
 from ray.rllib.evaluation.metrics import collect_episodes, summarize_episodes
 import datetime
@@ -137,10 +138,13 @@ def build_env(env_config=None, env_factory=None):
     cs_init = True if 'complete_scold' not in env_config else env_config['complete_scold'] #CompleteScold
     if cs_init:
         print("\n Complete Scold \n")
+        env = Closeness(env)
         env = CompleteScold(env)
+
     if rand_init:
         print("\n RAND TARGET \n")
         env = RandomTarget(env)
+
     return env
 
 def register_models():
