@@ -50,7 +50,7 @@ class LargePovBaselineModelTarget(TorchModelV2, nn.Module):
         pov_embed_size = 128
         inv_emded_size = 128
         target_emded_size = 128
-        embed_size = 128 * 3
+        embed_size = 128 * 2
 
         self.conv3x3 = nn.Conv2d(3, 64, 3, stride=1)
         self.relu1 = nn.ReLU()
@@ -67,9 +67,9 @@ class LargePovBaselineModelTarget(TorchModelV2, nn.Module):
             nn.ReLU(),
         )
         self.target_grid_emb = nn.Sequential(
-            nn.Linear(9*11*11, target_emded_size),
+            nn.Linear(9*11*11, inv_emded_size),
             nn.ReLU(),
-            nn.Linear(target_emded_size, target_emded_size),
+            nn.Linear(inv_emded_size, inv_emded_size),
             nn.ReLU(),
         )
         self.head = nn.Sequential(
@@ -94,16 +94,17 @@ class LargePovBaselineModelTarget(TorchModelV2, nn.Module):
         pov_embed = pov_embed.mean(axis=2)
         pov_embed = pov_embed.reshape(pov_embed.shape[0], -1)
 
-        tg = obs['target_grid']
+        tg = obs['target_grid']/6
         tg = tg.reshape(tg.shape[0], -1)
         tg_embed = self.target_grid_emb(tg)
 
-        inventory_compass = torch.cat([obs['inventory'], obs['compass']], -1)
+        inventory_compass = torch.cat([obs['inventory'], obs['compass']], 1)
         inv_comp_emb = self.inventory_compass_emb(inventory_compass)
 
-        head_input = torch.cat([pov_embed, inv_comp_emb,tg_embed], -1)
+        head_input = torch.cat([pov_embed, inv_comp_emb,tg_embed], 1)
 
         return self.head(head_input), state
+
 
 
 
