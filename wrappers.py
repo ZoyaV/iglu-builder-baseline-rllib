@@ -133,6 +133,12 @@ class Closeness(Wrapper):
             self.dist = 0
             return 0
 
+    def step(self, action):
+        obs, reward, done, info = super().step(action)
+        add_reward = self.calc_reward(info)
+        reward += add_reward
+        return obs, reward, done, info
+
 class CompleteScold(Wrapper):
     def __init__(self, env):
         super().__init__(env)
