@@ -104,7 +104,7 @@ class SweeperReward(Wrapper):
 
     def garbage(self, info):
         roi = info['grid'][info['target_grid'] == 0]
-        return len((np.where(roi)!=0)[0])
+        return len((np.where(roi!=0)[0]))
 
     def calc_reward(self, info):
         garbage = self.garbage(info)
@@ -134,7 +134,7 @@ class CompleteReward(Wrapper):
 
     def garbage(self, info):
         roi = info['grid'][info['target_grid'] == 0]
-        return len((np.where(roi)!=0)[0])
+        return len((np.where(roi!=0)[0]))
 
     def check_complete(self, info):
         roi = info['grid'][info['target_grid'] != 0]
