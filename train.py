@@ -28,6 +28,7 @@ from wrappers import \
     CompleteReward, \
     CompleteScold, \
     Closeness, \
+    SweeperReward, \
     Logger
 from ray.rllib.evaluation.metrics import collect_episodes, summarize_episodes
 import datetime
@@ -142,7 +143,7 @@ def build_env(env_config=None, env_factory=None):
     if cs_init:
         print("\n Complete Scold \n")
         env = Closeness(env)
-        env = CompleteScold(env)
+        env = SweeperReward(env)
 
     if rand_init:
         print("\n RAND TARGET \n")
