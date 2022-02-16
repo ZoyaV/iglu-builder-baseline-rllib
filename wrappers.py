@@ -98,6 +98,10 @@ class SweeperReward(Wrapper):
         super().__init__(env)
         self.last_step_garbage = 0
 
+    def reset(self):
+        self.last_step_garbage = 0
+        return super().reset()
+
     def garbage(self, info):
         roi = info['grid'][info['target_grid'] == 0]
         return len((np.where(roi)!=0)[0])
@@ -105,42 +109,50 @@ class SweeperReward(Wrapper):
     def calc_reward(self, info):
         garbage = self.garbage(info)
         if garbage > self.last_step_garbage:
-            return -0.0005
+            return -0.001
         elif  garbage < self.last_step_garbage:
-            return 0.002
-        self.last_step_garbage = garbage
+            self.last_step_garbage = garbage
+            return 0.005
         return 0
 
     def step(self, action):
         obs, reward, done, info = super().step(action)
         add_reward = self.calc_reward(info)
-        reward+=add_reward
+        reward += add_reward
         return obs, reward, done, info
 
 
 class CompleteReward(Wrapper):
-    def __init__(self, env, spec = "any"):
+    def __init__(self, env, spec = "all", hard_reset = False):
         super().__init__(env)
         self.T = spec
+        self.old_bs = 0
 
     def reset(self):
+        self.old_bs = 0
         return super().reset()
 
     def check_complete(self, info):
         roi = info['grid'][info['target_grid'] != 0]
+        build_size = len(np.where(roi != 0)[0])
         if self.T == "all":
-            return len(np.where(roi == 0)[0]) != 0  # TODO: fix roi == 0  to != 0
+            return len(np.where(roi == 0)[0]) != 0, build_size  # TODO: fix roi == 0  to != 0
         elif self.T == "any":
-            return len(np.where(roi != 0)[0]) > 0
+            return len(np.where(roi != 0)[0]) > 0, build_size
 
     def step(self, action):
         obs, reward, done, info = super().step(action)
-        check_sr = self.check_complete(info)
+        check_sr, bs = self.check_complete(info)
         if check_sr:
             reward = 1
             done = True
         else:
-            reward = 0
+            if bs > self.old_bs:
+                target_size = np.sum(info['target_grid'] != 0)
+                reward = 1/target_size
+                self.old_bs = bs
+            else:
+                reward = 0
         return obs, reward, done, info
 
 
