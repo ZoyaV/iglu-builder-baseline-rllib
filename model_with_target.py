@@ -122,7 +122,7 @@ class PovBaselineModelTarget(TorchModelV2, nn.Module):
         pov_embed_size = 256
         inv_emded_size = 256
         embed_size = 512
-        target_emded_size = 128
+        target_emded_size = 256
         self.pov_embed = nn.Sequential(
             nn.Conv2d(3, 64, 4, 4),
             nn.ReLU(),

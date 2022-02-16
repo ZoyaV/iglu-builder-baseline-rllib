@@ -10,8 +10,8 @@ def make_3d_cube(rand = False):
         y = random.randint(0,10)
         #z = random.randint(0, 8)
     else:
-        x = 5
-        y = 5
+        x = 1 #8
+        y = 1 #7
     z = 0
     print("\n CHANGE TASK \n", x,y,z)
     print(z,x,y)

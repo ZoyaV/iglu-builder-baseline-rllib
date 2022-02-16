@@ -44,6 +44,7 @@ class ActionsWrapper(Wrapper):
                     yield from wrapped(action)
                 else:
                     yield action
+
         return gen_actions
 
     def step(self, action):
@@ -51,7 +52,7 @@ class ActionsWrapper(Wrapper):
         for a in self.wrap_action(action):
             obs, reward, done, info = super().step(a)
             total_reward += reward
-            if done: 
+            if done:
                 return obs, total_reward, done, info
         return obs, total_reward, done, info
 
@@ -69,6 +70,7 @@ class ObsWrapper(Wrapper):
 
     def step(self, action):
         obs, reward, done, info = super().step(action)
+        print(done)
         info['grid'] = obs['grid']
         info['agentPos'] = obs['agentPos']
         return self.observation(obs, reward, done, info), reward, done, info
@@ -91,6 +93,7 @@ class TimeLimit(Wrapper):
             done = True
         return obs, reward, done, info
 
+
 class CompleteReward(Wrapper):
     def __init__(self, env):
         super().__init__(env)
@@ -100,7 +103,7 @@ class CompleteReward(Wrapper):
 
     def check_complete(self, info):
         roi = info['grid'][info['target_grid'] != 0]
-        return len(np.where(roi != 0)[0]) > 0 #TODO: fix roi == 0  to != 0
+        return len(np.where(roi != 0)[0]) > 0  # TODO: fix roi == 0  to != 0
 
     def step(self, action):
         obs, reward, done, info = super().step(action)
@@ -112,25 +115,35 @@ class CompleteReward(Wrapper):
             reward = 0
         return obs, reward, done, info
 
+
 class Closeness(Wrapper):
     def __init__(self, env):
         super().__init__(env)
         self.dist = 1000000
 
+    def reset(self):
+        self.dist = 1000000
+        return super().reset()
+
     def closeness(self, info):
-        roi_target = np.where(info['target_grid'] != 0)
-        position = info['agentPos']
-        goal = roi_target[0,0],roi_target[1,0]
-        dist = ((goal[0] - position[0])**2 + (goal[1] - position[1])**2)
+
+        roi = np.where(info['target_grid'] != 0)  # y x z
+        goal = roi[1], roi[2]
+        agent = info['agentPos'][:3]
+        agent_pos = agent[0] + 5, agent[2] + 5
+
+        dist = ((goal[0] - agent_pos[0]) ** 2 + (goal[1] - agent_pos[1]) ** 2) ** 0.5
         return dist
 
     def calc_reward(self, info):
         d2 = self.closeness(info)
-        if self.dist > d2:
+        if d2 < self.dist:
             self.dist = d2
-            return 0.01
+            return 0.005
+        elif d2 > self.dist:
+            # self.dist = 0
+            return -0.001
         else:
-            self.dist = 0
             return 0
 
     def step(self, action):
@@ -138,6 +151,7 @@ class Closeness(Wrapper):
         add_reward = self.calc_reward(info)
         reward += add_reward
         return obs, reward, done, info
+
 
 class CompleteScold(Wrapper):
     def __init__(self, env):
@@ -154,25 +168,25 @@ class CompleteScold(Wrapper):
         obs, reward, done, info = super().step(action)
         check_fill = self.check_filling(info)
         if check_fill:
-            reward-=0.0001
+            reward -= 0.0001
         return obs, reward, done, info
 
 
 class SizeReward(Wrapper):
-  def __init__(self, env):
-    super().__init__(env)
-    self.size = 0
+    def __init__(self, env):
+        super().__init__(env)
+        self.size = 0
 
-  def reset(self):
-    self.size = 0
-    return super().reset()
+    def reset(self):
+        self.size = 0
+        return super().reset()
 
-  def step(self, action):
-    obs, reward, done, info = super().step(action)
-    intersection = self.env.unwrapped.task.task_monitor.max_int
-    reward = max(intersection, self.size) - self.size
-    self.size = max(intersection, self.size)
-    return obs, reward, done, info
+    def step(self, action):
+        obs, reward, done, info = super().step(action)
+        intersection = self.env.unwrapped.task.task_monitor.max_int
+        reward = max(intersection, self.size) - self.size
+        self.size = max(intersection, self.size)
+        return obs, reward, done, info
 
 
 class SelectAndPlace(ActionsWrapper):
@@ -224,14 +238,14 @@ def flat_human_level(env, camera_delta=5):
 
 def flat_discrete(env, camera_delta=5):
     discretes = [env.action_space.no_op()]
-        
+
     forward = env.action_space.no_op()
     forward['forward'] = 2
     discretes.append(forward)
     backward = env.action_space.no_op()
     backward['forward'] = 1
     discretes.append(backward)
-    
+
     left = env.action_space.no_op()
     left['strafe'] = 1
     discretes.append(left)
@@ -247,7 +261,7 @@ def flat_discrete(env, camera_delta=5):
     jumpbackward['forward'] = 1
     jumpbackward['jump'] = 1
     discretes.append(jumpbackward)
-    
+
     jumpleft = env.action_space.no_op()
     jumpleft['strafe'] = 1
     jumpleft['jump'] = 1
@@ -424,13 +438,13 @@ class VideoLogger(Wrapper):
         # assuming dict
         self.flushed = False
         new_action = {}
-#         for key in action:
-#             new_action[key] = action[key]
-#             if isinstance(new_action[key], np.ndarray):
-#                 new_action[key] = new_action[key].tolist()
+        #         for key in action:
+        #             new_action[key] = action[key]
+        #             if isinstance(new_action[key], np.ndarray):
+        #                 new_action[key] = new_action[key].tolist()
         obs, reward, done, info = super().step(action)
         self.actions.append(action)
-        self.out.write(obs['pov'][:,:, ::-1].astype(np.uint8))
+        self.out.write(obs['pov'][:, :, ::-1].astype(np.uint8))
         self.obs.append({k: v for k, v in obs.items() if k != 'pov'})
         self.obs[-1]['reward'] = reward
         self.running_reward += reward
@@ -496,6 +510,7 @@ class Logger(Wrapper):
         self.running_reward += reward
         return obs, reward, done, info
 
+
 class OneBlockObservationWrapper(ObsWrapper):
     def __init__(self, env, include_target=False):
         super().__init__(env)
@@ -506,14 +521,14 @@ class OneBlockObservationWrapper(ObsWrapper):
         }
         if include_target:
             self.observation_space['target'] = \
-                spaces.Tuple(spaces.Discrete(9),spaces.Discrete(11),spaces.Discrete(11))
+                spaces.Tuple(spaces.Discrete(9), spaces.Discrete(11), spaces.Discrete(11))
         self.observation_space = gym.spaces.Dict(self.observation_space)
 
     def observation(self, obs, reward=None, done=None, info=None):
         if info is not None:
             if 'target_grid' in info:
                 target_grid = info['target_grid']
-                #del info['target_grid']
+                # del info['target_grid']
             else:
                 logger.error(f'info: {info}')
                 if hasattr(self.unwrapped, 'should_reset'):
@@ -521,13 +536,14 @@ class OneBlockObservationWrapper(ObsWrapper):
                 target_grid = self.env.unwrapped.tasks.current.target_grid
         else:
             target_grid = self.env.unwrapped.tasks.current.target_grid
-        target = np.where(target_grid!=0)
+        target = np.where(target_grid != 0)
         return {
             'pov': obs['pov'].astype(np.float32),
             'inventory': obs['inventory'],
             'compass': np.array([obs['compass']['angle'].item()]),
-            'target':(target[0,0],target[1,0],target[2,0])
+            'target': (target[0, 0], target[1, 0], target[2, 0])
         }
+
 
 class VisualOneBlockObservationWrapper(ObsWrapper):
     def __init__(self, env, include_target=False):
@@ -536,7 +552,7 @@ class VisualOneBlockObservationWrapper(ObsWrapper):
             'pov': gym.spaces.Box(low=0, high=255, shape=(64, 64, 3)),
             'inventory': gym.spaces.Box(low=0.0, high=20.0, shape=(6,)),
             'compass': gym.spaces.Box(low=-180.0, high=180.0, shape=(1,)),
-            'target': spaces.Tuple([spaces.Discrete(9),spaces.Discrete(11),spaces.Discrete(11)])
+            'target': spaces.Tuple([spaces.Discrete(9), spaces.Discrete(11), spaces.Discrete(11)])
         }
         if include_target:
             self.observation_space['target_grid'] = \
@@ -547,7 +563,7 @@ class VisualOneBlockObservationWrapper(ObsWrapper):
         if info is not None:
             if 'target_grid' in info:
                 target_grid = info['target_grid']
-                #del info['target_grid']
+                # del info['target_grid']
             else:
                 logger.error(f'info: {info}')
                 if hasattr(self.unwrapped, 'should_reset'):
@@ -563,10 +579,11 @@ class VisualOneBlockObservationWrapper(ObsWrapper):
             'target': (target[0][0], target[1][0], target[2][0])
         }
 
+
 class VisualObservationWrapper(ObsWrapper):
     def __init__(self, env, include_target=False):
         super().__init__(env)
-        self.observation_space = {   
+        self.observation_space = {
             'pov': gym.spaces.Box(low=0, high=255, shape=(64, 64, 3)),
             'inventory': gym.spaces.Box(low=0.0, high=20.0, shape=(6,)),
             'compass': gym.spaces.Box(low=-180.0, high=180.0, shape=(1,))
@@ -582,7 +599,7 @@ class VisualObservationWrapper(ObsWrapper):
 
             if 'target_grid' in info:
                 target_grid = info['target_grid']
-                #del info['target_grid']
+                # del info['target_grid']
             else:
                 logger.error(f'info: {info}')
                 if hasattr(self.unwrapped, 'should_reset'):
@@ -595,7 +612,7 @@ class VisualObservationWrapper(ObsWrapper):
             'pov': obs['pov'].astype(np.float32),
             'inventory': obs['inventory'],
             'compass': np.array([obs['compass']['angle'].item()])
-            }
+        }
         if self.include_target:
             observe['target_grid'] = target_grid
         return observe

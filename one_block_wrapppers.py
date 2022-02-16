@@ -19,7 +19,7 @@ from iglu.tasks import RandomTasks
 
 class RandomTarget(gym.Wrapper):
     #current_env  = [[None]]
-    def __init__(self, env, thresh = 0.77):
+    def __init__(self, env, thresh = 0.37):
         super().__init__(env)
         self.thresh = thresh
         self.total_reward = 0
@@ -40,7 +40,7 @@ class RandomTarget(gym.Wrapper):
             # print("count = ", self.count)
             # print(" --- upd reward ---- \n")
 
-            if (self.total_reward > self.thresh) or (self.total_reward < 0.001):
+            if (self.total_reward > self.thresh):
 
                 # print("\n ----Make new Goal ----- \n")
                 self.changes += 1
@@ -50,7 +50,7 @@ class RandomTarget(gym.Wrapper):
                            allow_float= False,
                            max_dist= 1,
                            num_colors= 1,
-                           max_cache=0,
+                           max_cache=10,
                         )
                 self.update_taskset(task)
                 self.sum = self.thresh / 10
