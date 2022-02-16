@@ -172,7 +172,7 @@ class CompleteScold(Wrapper):
         obs, reward, done, info = super().step(action)
         check_fill = self.check_filling(info)
         if check_fill:
-            reward -= 0.0001
+            reward -= 0.0005
         return obs, reward, done, info
 
 
