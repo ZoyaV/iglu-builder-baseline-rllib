@@ -95,15 +95,19 @@ class TimeLimit(Wrapper):
 
 
 class CompleteReward(Wrapper):
-    def __init__(self, env):
+    def __init__(self, env, spec = "any"):
         super().__init__(env)
+        self.spec = spec
 
     def reset(self):
         return super().reset()
 
     def check_complete(self, info):
         roi = info['grid'][info['target_grid'] != 0]
-        return len(np.where(roi != 0)[0]) > 0  # TODO: fix roi == 0  to != 0
+        if self.spec == "all":
+            return len(np.where(roi == 0)[0]) != 0  # TODO: fix roi == 0  to != 0
+        elif self.spec == "any":
+            return len(np.where(roi != 0)[0]) > 0
 
     def step(self, action):
         obs, reward, done, info = super().step(action)
@@ -128,7 +132,7 @@ class Closeness(Wrapper):
     def closeness(self, info):
 
         roi = np.where(info['target_grid'] != 0)  # y x z
-        goal = roi[1], roi[2]
+        goal = np.mean(roi[1]), np.mean(roi[2])
         agent = info['agentPos'][:3]
         agent_pos = agent[0] + 5, agent[2] + 5
 

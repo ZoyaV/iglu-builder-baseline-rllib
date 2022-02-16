@@ -20,3 +20,18 @@ def make_3d_cube(rand = False):
         ('<Architect> Please, build a stack of three blue blocks somewhere.\n'
          '<Builder> Sure.',
          custom_grid)])
+
+def make_plane(rand = False, size = 1):
+    custom_grid = np.zeros((9, 11, 11))
+    plane_size = int(size * 11)
+    if rand == True:
+        x = random.randint(0, 10-plane_size)
+        y = random.randint(0, 10-plane_size)
+    else:
+        x = 0
+        y = 0
+    custom_grid[0, x:x+plane_size, y:y+plane_size] = 1 #blue color
+    return CustomTasks([
+        ('<Architect> Please, build a stack of three blue blocks somewhere.\n'
+         '<Builder> Sure.',
+         custom_grid)])
