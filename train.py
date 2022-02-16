@@ -33,7 +33,7 @@ from ray.rllib.evaluation.metrics import collect_episodes, summarize_episodes
 import datetime
 from model import GridBaselineModel, PovBaselineModel, LargePovBaselineModel
 from model_with_target import PovBaselineModelTarget, LargePovBaselineModelTarget
-from custom_tasks import make_3d_cube
+from custom_tasks import make_3d_cube,make_plane
 from one_block_wrapppers import SizeLongReward, RandomTarget
 
 logging.basicConfig(stream=sys.stdout)
@@ -103,7 +103,8 @@ def build_env(env_config=None, env_factory=None):
         elif env_config['task_mode'] == 'many_tasks':
             env.update_taskset(TaskSet(preset=env_config['task_id']))
         elif env_config['task_mode'] == 'custom_task':
-            env.update_taskset(make_3d_cube())
+            #env.update_taskset(make_3d_cube())
+            env.update_taskset(make_plane())
         elif env_config['task_mode'] == 'random_task':
             env.update_taskset(RandomTasks(
                 max_blocks=env_config['random_tasks'].get('max_blocks', 1),

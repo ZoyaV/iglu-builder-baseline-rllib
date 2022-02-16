@@ -21,7 +21,7 @@ def make_3d_cube(rand = False):
          '<Builder> Sure.',
          custom_grid)])
 
-def make_plane(rand = False, size = 1):
+def make_plane(rand = False, size = 0.35):
     custom_grid = np.zeros((9, 11, 11))
     plane_size = int(size * 11)
     if rand == True:
