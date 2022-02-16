@@ -70,7 +70,7 @@ class ObsWrapper(Wrapper):
 
     def step(self, action):
         obs, reward, done, info = super().step(action)
-        print(done)
+      #  print(done)
         info['grid'] = obs['grid']
         info['agentPos'] = obs['agentPos']
         return self.observation(obs, reward, done, info), reward, done, info
@@ -132,13 +132,21 @@ class CompleteReward(Wrapper):
         self.old_bs = 0
         return super().reset()
 
+    def garbage(self, info):
+        roi = info['grid'][info['target_grid'] == 0]
+        return len((np.where(roi)!=0)[0])
+
     def check_complete(self, info):
         roi = info['grid'][info['target_grid'] != 0]
         build_size = len(np.where(roi != 0)[0])
         if self.T == "all":
-            return len(np.where(roi == 0)[0]) != 0, build_size  # TODO: fix roi == 0  to != 0
+            return len(np.where(roi == 0)[0]) == 0, build_size  # TODO: fix roi == 0  to != 0
         elif self.T == "any":
             return len(np.where(roi != 0)[0]) > 0, build_size
+        elif self.T == "hardany":
+            return (len(np.where(roi != 0)[0]) > 0) and (self.garbage(info) == 0), build_size
+        elif self.T == "hardall":
+            return (len(np.where(roi == 0)[0]) == 0) and (self.garbage(info) == 0), build_size
 
     def step(self, action):
         obs, reward, done, info = super().step(action)
