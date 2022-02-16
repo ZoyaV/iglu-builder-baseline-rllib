@@ -93,20 +93,44 @@ class TimeLimit(Wrapper):
             done = True
         return obs, reward, done, info
 
-
-class CompleteReward(Wrapper):
+class SweeperReward(Wrapper):
     def __init__(self, env):
         super().__init__(env)
-        self.spec = "any"
+        self.last_step_garbage = 0
+
+    def garbage(self, info):
+        roi = info['grid'][info['target_grid'] == 0]
+        return len((np.where(roi)!=0)[0])
+
+    def calc_reward(self, info):
+        garbage = self.garbage(info)
+        if garbage > self.last_step_garbage:
+            return -0.0005
+        elif  garbage < self.last_step_garbage:
+            return 0.002
+        self.last_step_garbage = garbage
+        return 0
+
+    def step(self, action):
+        obs, reward, done, info = super().step(action)
+        add_reward = self.calc_reward(info)
+        reward+=add_reward
+        return obs, reward, done, info
+
+
+class CompleteReward(Wrapper):
+    def __init__(self, env, spec = "any"):
+        super().__init__(env)
+        self.T = spec
 
     def reset(self):
         return super().reset()
 
     def check_complete(self, info):
         roi = info['grid'][info['target_grid'] != 0]
-        if self.spec == "all":
+        if self.T == "all":
             return len(np.where(roi == 0)[0]) != 0  # TODO: fix roi == 0  to != 0
-        elif self.spec == "any":
+        elif self.T == "any":
             return len(np.where(roi != 0)[0]) > 0
 
     def step(self, action):
