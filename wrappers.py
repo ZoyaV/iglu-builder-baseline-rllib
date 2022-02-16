@@ -95,9 +95,9 @@ class TimeLimit(Wrapper):
 
 
 class CompleteReward(Wrapper):
-    def __init__(self, env, spec = "any"):
+    def __init__(self, env):
         super().__init__(env)
-        self.spec = spec
+        self.spec = "any"
 
     def reset(self):
         return super().reset()
