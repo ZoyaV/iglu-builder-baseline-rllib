@@ -190,7 +190,7 @@ class Closeness(Wrapper):
             return 0.005
         elif d2 > self.dist:
             # self.dist = 0
-            return -0.001
+            return 0
         else:
             return 0
 
