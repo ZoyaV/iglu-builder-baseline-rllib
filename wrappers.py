@@ -96,10 +96,12 @@ class TimeLimit(Wrapper):
 class SweeperReward(Wrapper):
     def __init__(self, env):
         super().__init__(env)
-        self.last_step_garbage = 0
+        self.last_step_garbage_min = 1000
+        self.last_step_garbage_max = 0
 
     def reset(self):
-        self.last_step_garbage = 0
+        self.last_step_garbage_min = 1000
+        self.last_step_garbage_max = 0
         return super().reset()
 
     def garbage(self, info):
@@ -108,10 +110,11 @@ class SweeperReward(Wrapper):
 
     def calc_reward(self, info):
         garbage = self.garbage(info)
-        if garbage > self.last_step_garbage:
+        if garbage > self.last_step_garbage_max:
+            self.last_step_garbage_max = garbage
             return -0.001
-        elif  garbage < self.last_step_garbage:
-            self.last_step_garbage = garbage
+        elif  garbage < self.last_step_garbage_min:
+            self.last_step_garbage_min = garbage
             return 0.005
         return 0
 
@@ -187,7 +190,7 @@ class Closeness(Wrapper):
         d2 = self.closeness(info)
         if d2 < self.dist:
             self.dist = d2
-            return 0.005
+            return 0.001
         elif d2 > self.dist:
             # self.dist = 0
             return 0
