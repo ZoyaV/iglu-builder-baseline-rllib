@@ -21,12 +21,16 @@ def make_3d_cube(rand = False):
          '<Builder> Sure.',
          custom_grid)])
 
-def make_plane(rand = False, size = 0.4):
+def make_plane(rand = False, size = 0.5, rand_conf =  1/4):
     custom_grid = np.zeros((9, 11, 11))
     plane_size = int(size * 11)
     if rand == True:
-        x = random.randint(0, 10-plane_size)
-        y = random.randint(0, 10-plane_size)
+        if rand_conf == 1:
+            x = random.randint(0, 10-plane_size)
+            y = random.randint(0, 10-plane_size)
+        if rand_conf == 1/4:
+            x = random.choice(list(range(0,11-plane_size,plane_size)))
+            y = random.choice(list(range(0, 11 - plane_size, plane_size)))
     else:
         x = 0
         y = 0
