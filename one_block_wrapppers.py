@@ -14,7 +14,7 @@ from collections import defaultdict
 from typing import Generator
 from minerl_patched.herobraine.hero import spaces
 from wrappers import Wrapper
-from custom_tasks import make_3d_cube
+from custom_tasks import make_3d_cube, make_plane
 from iglu.tasks import RandomTasks
 
 class RandomTarget(gym.Wrapper):
@@ -44,14 +44,15 @@ class RandomTarget(gym.Wrapper):
 
                 # print("\n ----Make new Goal ----- \n")
                 self.changes += 1
-                task = RandomTasks(
-                           max_blocks=1,
-                           height_levels=1,
-                           allow_float= False,
-                           max_dist= 1,
-                           num_colors= 1,
-                           max_cache=10,
-                        )
+                # task = RandomTasks(
+                #            max_blocks=1,
+                #            height_levels=1,
+                #            allow_float= False,
+                #            max_dist= 1,
+                #            num_colors= 1,
+                #            max_cache=10,
+                #         )
+                task = make_plane(rand=True)
                 self.update_taskset(task)
                 self.sum = self.thresh / 10
                 self.count = 0
